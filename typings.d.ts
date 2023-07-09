@@ -1,13 +1,4 @@
-interface Board {
-  columns: Map<TypedColumn, Column>;
-}
-
 type TypedColumn = 'todo' | 'inprogress' | 'done';
-
-interface Column {
-  id: TypedColumn;
-  todos: Todo[];
-}
 
 interface Todo {
   $id: string;
@@ -15,6 +6,15 @@ interface Todo {
   title: string;
   status: TypedColumn;
   image?: Image;
+}
+
+interface Column {
+  id: TypedColumn;
+  todos: Todo[];
+}
+
+interface Board {
+  columns: Map<TypedColumn, Column>;
 }
 
 interface Image {
