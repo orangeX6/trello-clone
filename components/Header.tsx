@@ -1,12 +1,57 @@
 'use client';
 
-import React from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import Image from 'next/image';
 import Trello from '@/public/Trello.png';
 import { MagnifyingGlassIcon, UserCircleIcon } from '@heroicons/react/24/solid';
 import Avatar from 'react-avatar';
+import { useBoardStore } from '@/store/BoardStore';
+import fetchSuggestion from '@/lib/fetchSuggestion';
 
 const Header = () => {
+  const [inputValue, setInputValue] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [suggestion, setSuggestion] = useState<string>('');
+
+  const [setSearch, board] = useBoardStore((state) => [
+    state.zt_setSearch,
+    state.board,
+  ]);
+
+  // Debouncer
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setSearch(inputValue);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [inputValue, setSearch]);
+
+  useEffect(() => {
+    if (board.columns.size === 0) return;
+
+    setLoading(true);
+
+    const fetchSuggestionFunc = async () => {
+      const suggestion = await fetchSuggestion(board);
+      setSuggestion(suggestion);
+      setLoading(false);
+    };
+
+    fetchSuggestionFunc();
+  }, [board]);
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
+
+  // Helper function to render text with newlines
+  const renderWithNewlines = (text: string) => {
+    return text.split('\n').map((line, index) => <p key={index}>{line}</p>);
+  };
+
   return (
     <header>
       <div className="flex flex-col md:flex-row items-center p-5 bg-gray-500/10 rounded-b-2xl">
@@ -42,6 +87,8 @@ const Header = () => {
               type="text"
               placeholder="Search"
               className="flex-1 outline-none p-2"
+              onChange={handleChange}
+              value={inputValue}
             />
             <button hidden type="submit">
               Search
@@ -54,10 +101,18 @@ const Header = () => {
       </div>
 
       <div className="flex items-center justify-center px-5 py-2 md:py-5">
-        <p className="flex items-center text-sm font-light pr-5 shadow-xl rounded-xl w-fit bg-white italic max-w-3xl text-[#0a62da] p-5">
-          <UserCircleIcon className="inline-block h-10 w-10 text-[#0a62da] mr-1" />
-          GPT is summarising your tasks for the day...
-        </p>
+        <div className="flex items-center text-sm font-light pr-5 shadow-xl rounded-xl w-fit bg-white italic max-w-3xl text-[#0a62da] p-5">
+          <UserCircleIcon
+            className={`inline-block h-10 w-10 text-[#0a62da] mr-1 ${
+              loading && 'animate-spin'
+            }`}
+          />
+          <div>
+            {suggestion && !loading
+              ? renderWithNewlines(suggestion)
+              : 'Gemini is summarizing your tasks for the day...'}
+          </div>
+        </div>
       </div>
     </header>
   );
