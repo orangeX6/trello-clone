@@ -38,6 +38,7 @@ export function Modal() {
 
     if (!addTaskInput) return;
 
+    console.log(addTaskInput, addTaskType, image);
     addTask(addTaskInput, addTaskType, image);
     setImage(null);
     setAddTaskInput('');

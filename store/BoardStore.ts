@@ -64,49 +64,49 @@ export const useBoardStore = create<BoardState>((set, get) => ({
           fileId: fileUploaded.$id,
         };
       }
-
-      const { $id } = await databases.createDocument(
-        process.env.NEXT_PUBLIC_DATABASE_ID!,
-        process.env.NEXT_PUBLIC_TODOS_COLLECTION_ID!,
-        ID.unique(),
-        {
-          title: todo,
-          status: columnId,
-          ...(file && { image: JSON.stringify(file) }),
-        }
-      );
-
-      set({ addTaskInput: '' });
-
-      set((state) => {
-        const newColumns = new Map(state.board.columns);
-
-        const newTodo: Todo = {
-          $id,
-          $createdAt: new Date().toISOString(),
-          title: todo,
-          status: columnId,
-          ...(file && { image: file }),
-        };
-
-        const column = newColumns.get(columnId);
-
-        if (!column) {
-          newColumns.set(columnId, {
-            id: columnId,
-            todos: [newTodo],
-          });
-        } else {
-          newColumns.get(columnId)?.todos.push(newTodo);
-        }
-
-        return {
-          board: {
-            columns: newColumns,
-          },
-        };
-      });
     }
+
+    const { $id } = await databases.createDocument(
+      process.env.NEXT_PUBLIC_DATABASE_ID!,
+      process.env.NEXT_PUBLIC_TODOS_COLLECTION_ID!,
+      ID.unique(),
+      {
+        title: todo,
+        status: columnId,
+        ...(file && { image: JSON.stringify(file) }),
+      }
+    );
+
+    set({ addTaskInput: '' });
+
+    set((state) => {
+      const newColumns = new Map(state.board.columns);
+
+      const newTodo: Todo = {
+        $id,
+        $createdAt: new Date().toISOString(),
+        title: todo,
+        status: columnId,
+        ...(file && { image: file }),
+      };
+
+      const column = newColumns.get(columnId);
+
+      if (!column) {
+        newColumns.set(columnId, {
+          id: columnId,
+          todos: [newTodo],
+        });
+      } else {
+        newColumns.get(columnId)?.todos.push(newTodo);
+      }
+
+      return {
+        board: {
+          columns: newColumns,
+        },
+      };
+    });
   },
   zt_deleteTask: async (taskIndex, todo, columnId) => {
     const columns = new Map(get().board.columns);
