@@ -36,7 +36,7 @@ export async function POST(request: Request) {
   )}`;
 
   const result = await chat.sendMessage(msg);
-  const response = await result.response;
+  const response = result.response;
   const text = response.text();
 
   return NextResponse.json({ text });

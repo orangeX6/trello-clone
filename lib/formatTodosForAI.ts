@@ -22,11 +22,13 @@
 // export default formatTodosForAI;
 
 const formatTodosForAI = (board: Board) => {
-  const flatArray = Array.from(board.columns.values())
+  const flatArray: { [key in keyof TypedColumn]: number } = Array.from(
+    board.columns.values()
+  )
     .flat()
     .reduce((obj, curr) => {
       return { ...obj, [curr.id]: curr.todos.length };
-    }, {} as { [key in TypedColumn]: number });
+    }, {} as { [key in keyof TypedColumn]: number });
 
   return flatArray;
 };
